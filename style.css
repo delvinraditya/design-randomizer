@@ -1,0 +1,263 @@
+/* =========================================================
+   DAILY DESIGN RANDOMIZER — STYLESHEET
+   This file is organized so you can art-direct it yourself.
+   Look for the "CUSTOMIZE HERE" comment blocks — those are
+   the spots you'll most likely want to change first.
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   1. CUSTOMIZE HERE: FONTS
+   Swap these variables for your own typefaces. If you're
+   using Google Fonts, add the <link> tag in index.html's
+   <head>, then just change the font names below.
+   --------------------------------------------------------- */
+:root {
+  --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* ---------------------------------------------------------
+     2. CUSTOMIZE HERE: COLORS
+     This is your core color system. Everything in the page
+     pulls from these variables, so changing a value here
+     updates it everywhere at once.
+     --------------------------------------------------------- */
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-text: #111111;
+  --color-text-muted: #6b6b6b;
+  --color-border: #e2e2e2;
+  --color-accent: #111111;      /* button + accent color, swap for a brand color */
+  --color-accent-text: #ffffff; /* text color that sits on top of --color-accent */
+
+  /* ---------------------------------------------------------
+     3. CUSTOMIZE HERE: SPACING
+     Adjust these to make the layout feel tighter or airier.
+     Everything below references these instead of raw pixel
+     values, so tweaking one variable adjusts the whole page.
+     --------------------------------------------------------- */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 3.5rem;
+  --space-xl: 5rem;
+
+  --radius: 4px; /* corner roundness — set to 0 for sharp edges */
+}
+
+
+/* ---------------------------------------------------------
+   RESET / BASE
+   Keeps browser default spacing from throwing off your layout.
+   --------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  padding: var(--space-md);
+}
+
+
+/* ---------------------------------------------------------
+   HEADER
+   --------------------------------------------------------- */
+.site-header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.site-header h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.site-header .subtitle {
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+  font-size: 1rem;
+}
+
+
+/* ---------------------------------------------------------
+   LAYOUT WRAPPER
+   Holds the two sections side by side on wide screens and
+   stacked on narrow screens (see media query near the bottom).
+   --------------------------------------------------------- */
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+
+/* ---------------------------------------------------------
+   CARD (shared style for both the Design and Palette sections)
+   --------------------------------------------------------- */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-sm);
+}
+
+.card-header h2 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+
+/* ---------------------------------------------------------
+   DESIGN PROMPT DISPLAY
+   --------------------------------------------------------- */
+.prompt-display {
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 600;
+  text-align: center;
+  padding: var(--space-lg) var(--space-sm);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ---------------------------------------------------------
+   COLOR SWATCHES
+   Each swatch is a plain div with its background-color set
+   by JavaScript. flex-wrap lets them reflow on small screens.
+   --------------------------------------------------------- */
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.swatch {
+  flex: 1 1 60px;
+  height: 80px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+/* Small hex code label shown at the bottom of each swatch */
+.swatch .hex-label {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.65rem;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.palette-name {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: var(--space-xs);
+}
+
+.palette-description {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+
+/* ---------------------------------------------------------
+   BUTTONS
+   --------------------------------------------------------- */
+.btn {
+  align-self: flex-start;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  background-color: var(--color-accent);
+  color: var(--color-accent-text);
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-md);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn:active {
+  opacity: 0.7;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+
+/* ---------------------------------------------------------
+   "YESTERDAY'S PICK" TEXT (stretch goal feature)
+   --------------------------------------------------------- */
+.yesterday-pick {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  min-height: 1em; /* keeps layout stable even when empty */
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+.site-footer {
+  max-width: 960px;
+  margin: var(--space-lg) auto 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE: stack the two cards on narrower screens
+   --------------------------------------------------------- */
+@media (max-width: 700px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
+}

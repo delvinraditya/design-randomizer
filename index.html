@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Design Randomizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>Daily Design Randomizer</h1>
+    <p class="subtitle">Pick a task. Pick a palette. Start making something.</p>
+  </header>
+
+  <main class="wrapper">
+
+    <!-- ===================== -->
+    <!-- SECTION 1: DESIGN PROMPT -->
+    <!-- ===================== -->
+    <section class="card" id="design-section">
+      <div class="card-header">
+        <h2>Design</h2>
+        <span class="eyebrow">Task Prompt</span>
+      </div>
+
+      <!-- This is where the randomly chosen design prompt gets displayed -->
+      <div class="prompt-display" id="promptDisplay">
+        Press "Randomize" to get a design task
+      </div>
+
+      <button class="btn" id="randomizePromptBtn">Randomize</button>
+
+      <!-- Optional stretch feature: shows what was picked last time the app was used -->
+      <p class="yesterday-pick" id="yesterdayPrompt"></p>
+    </section>
+
+    <!-- ===================== -->
+    <!-- SECTION 2: COLOR PALETTE -->
+    <!-- ===================== -->
+    <section class="card" id="palette-section">
+      <div class="card-header">
+        <h2>Color Palette</h2>
+        <span class="eyebrow">Mood &amp; Theory</span>
+      </div>
+
+      <!-- The color swatches (small colored boxes) get generated in here by JavaScript -->
+      <div class="swatch-row" id="swatchRow"></div>
+
+      <!-- The palette's name and description text go here -->
+      <h3 class="palette-name" id="paletteName">No palette selected yet</h3>
+      <p class="palette-description" id="paletteDescription">Press "New Palette" to get a color scheme and the thinking behind it.</p>
+
+      <button class="btn" id="randomizePaletteBtn">New Palette</button>
+
+      <!-- Optional stretch feature: shows what was picked last time the app was used -->
+      <p class="yesterday-pick" id="yesterdayPalette"></p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Made for daily practice. Edit the arrays in script.js to add your own prompts and palettes.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
