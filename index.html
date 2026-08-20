@@ -14,8 +14,8 @@
     <img src="https://res.cloudinary.com/pav3kc8d/image/upload/f_auto,q_auto/DDDDV-05.png" alt="Logo">
   </a>
   <header class="site-header">
-    <h1>Daily Design Randomizer</h1>
-    <p class="subtitle">Pick a task. Pick a palette. Start making something.</p>
+    <h1>Designer Case</h1>
+    <p  class="subtitle">GOLD GOLD GOLD.</p>
   </header>
 
   <main class="wrapper">
@@ -26,14 +26,31 @@
     <section class="card" id="design-section">
       <div class="card-header">
         <h2>Design</h2>
-        <span class="eyebrow">Task Prompt</span>
+        <span class="eyebrow">Theme</span>
       </div>
+  <div class="img-row" id="imgRow"></div>
+      <!-- =====================================================
+           The prompt result and its reel now share one fixed-size
+           "stage." Both are absolutely positioned to fill it (see
+           .result-stage in style.css), so only one is visible at
+           a time and the card never grows or shrinks when the
+           reel appears. Element IDs are unchanged — script.js
+           doesn't know or care about this wrapper. -->
+      <div class="result-stage" id="promptStage">
+        <!-- This is where the randomly chosen design prompt gets displayed -->
+        <div class="prompt-display" id="promptDisplay">
+          No  Theme Selected Yet.
+        </div>
+       
 
-      <!-- This is where the randomly chosen design prompt gets displayed -->
-      <div class="prompt-display" id="promptDisplay">
-        Press "Randomize" to get a design task
+        <div class="reel-viewport" id="promptReelViewport">
+          <div class="reel-marker"></div>
+          <div class="reel-track" id="promptReelTrack"></div>
+        </div>
       </div>
-
+      <p class="prompt-description" id="promptDescription">
+          Press "Randomize" to get a design theme.
+        </p>
       <button class="btn" id="randomizePromptBtn">Randomize</button>
 
       <!-- Optional stretch feature: shows what was picked last time the app was used -->
@@ -45,17 +62,29 @@
     <!-- ===================== -->
     <section class="card" id="palette-section">
       <div class="card-header">
-        <h2>Color Palette</h2>
-        <span class="eyebrow">Mood &amp; Theory</span>
+        <h2>Color</h2>
+        <span class="eyebrow">Palette</span>
       </div>
 
-      <!-- The color swatches (small colored boxes) get generated in here by JavaScript -->
-      <div class="swatch-row" id="swatchRow"></div>
+      <!-- Same fixed-size "stage" pattern as the Design section
+           above: the palette result and its reel are absolutely
+           positioned to fill this container, so the card stays a
+           constant size whether the reel or the result is showing. -->
+      <div class="result-stage" id="paletteStage">
+        <div class="palette-result" id="paletteResult">
+          <!-- The color swatches (small colored boxes) get generated in here by JavaScript -->
+          <div class="swatch-row" id="swatchRow"></div>
 
-      <!-- The palette's name and description text go here -->
-      <h3 class="palette-name" id="paletteName">No palette selected yet</h3>
-      <p class="palette-description" id="paletteDescription">Press "New Palette" to get a color scheme and the thinking behind it.</p>
+          <!-- The palette's name and description text go here -->
+          <h3 class="palette-name" id="paletteName">No Palette Selected Yet.</h3>
+        </div>
 
+        <div class="reel-viewport" id="paletteReelViewport">
+          <div class="reel-marker"></div>
+          <div class="reel-track" id="paletteReelTrack"></div>
+        </div>
+      </div>
+<p class="palette-description" id="paletteDescription">Press "New Palette" to get a color scheme and the thinking behind it.</p>
       <button class="btn" id="randomizePaletteBtn">New Palette</button>
 
       <!-- Optional stretch feature: shows what was picked last time the app was used -->
@@ -65,7 +94,8 @@
   </main>
 
   <footer class="site-footer">
-    <p>Made for daily practice. By Dlvyne © 2026.</p>
+    <p>Take action and get out of comfort zone blud. 
+      <br> Dlvyne © 2026. V1.1</br> </p>
   </footer>
 
   <script src="script.js"></script>

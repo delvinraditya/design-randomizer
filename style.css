@@ -43,6 +43,18 @@
   --space-xl: 5rem;
 
   --radius: 4px; /* corner roundness — set to 0 for sharp edges */
+
+ /* ---------------------------------------------------------
+     4. CUSTOMIZE HERE: RESULT STAGE HEIGHT
+     Fixed heights for the "stage" that holds the result (the
+     prompt text, or the swatches/name/description) and the reel
+     animation. Because both are locked to this same height, the
+     card never grows or shrinks when the reel appears — raise
+     these if you add longer prompts or palette descriptions and
+     text starts feeling cramped.
+     --------------------------------------------------------- */
+  --prompt-stage-height: 200px;
+  --palette-stage-height: 200px;
 }
 
 
@@ -62,6 +74,9 @@ body {
   color: var(--color-text);
   line-height: 1.5;
   padding: var(--space-md);
+  background-position: center;
+  background-image: url('https://res.cloudinary.com/pav3kc8d/image/upload/v1787226375/Cs2_italy.webp');
+  backdrop-filter: blur(10px);
 }
 
 
@@ -139,22 +154,82 @@ body {
 
 
 /* ---------------------------------------------------------
+   RESULT STAGE
+   The shared container that holds either the result (prompt
+   text, or palette swatches/name/description) or the reel
+   animation — never both changing the page's height at once.
+ 
+   position: relative here, combined with position: absolute on
+   both children below, makes the children stack directly on top
+   of each other instead of sitting one after another in normal
+   document flow. Whichever one is visible (display: none/block,
+   controlled by JS toggling "is-active" on .reel-viewport) is
+   what you see; the stage itself always stays the fixed height
+   set by --prompt-stage-height / --palette-stage-height, so nothing
+   around it ever shifts.
+   --------------------------------------------------------- */
+.result-stage {
+  position: relative;
+  width: 100%;
+}
+ 
+#promptStage {
+  height: var(--prompt-stage-height);
+}
+ 
+#paletteStage {
+  height: var(--palette-stage-height);
+}
+ 
+/* Every direct child of a stage (the result, and the reel) fills
+   it exactly — same position, same size — which is what makes
+   them look like one thing swapping in place rather than two
+   separate blocks. */
+.result-stage > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------------------------------------------------------
    DESIGN PROMPT DISPLAY
    --------------------------------------------------------- */
 .prompt-display {
   font-family: var(--font-heading);
   font-size: clamp(1.25rem, 3vw, 1.75rem);
   font-weight: 600;
+  margin-top: var(--space-xs);  font-family: var(--font-heading);
   text-align: center;
-  padding: var(--space-lg) var(--space-sm);
+  padding: 0 var(--space-sm);
   border: 1px dashed var(--color-border);
   border-radius: var(--radius);
-  min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-xs);
+  overflow: hidden;
+}
+.prompt-description {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
 }
 
+/* ---------------------------------------------------------
+   PALETTE RESULT
+   Wraps the swatches, name, and description as one block so it
+   can be positioned as a single layer inside .result-stage,
+   right alongside the palette reel.
+   --------------------------------------------------------- */
+.palette-result {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-xs);
+  overflow: hidden; /* keeps an unusually long custom description from pushing past the fixed stage height */
+}
+ 
+ 
 
 /* ---------------------------------------------------------
    COLOR SWATCHES
@@ -165,6 +240,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
+  flex-shrink: 0;
 }
 
 .swatch {
@@ -190,9 +266,18 @@ body {
 
 .palette-name {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-top: var(--space-xs);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 600;
+  margin-top: var(--space-xs);  font-family: var(--font-heading);
+  text-align: center;
+  padding: 0 var(--space-sm);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  overflow: hidden;
 }
 
 .palette-description {
@@ -253,7 +338,7 @@ body {
   color: var(--color-text);
   font-size: 0.8rem;
 }
-
+/* LOGO NGAMBANG */
  .floating-logo {
         position: fixed;       /* Stays in place when scrolling */
         bottom: 100px;          /* Distance from bottom */
@@ -296,4 +381,186 @@ body {
   .wrapper {
     grid-template-columns: 1fr;
   }
+}
+/* =========================================================
+   NEW SECTION — CASE-OPENING REVEAL ANIMATION
+   Everything below is additive. Nothing above this line was
+   changed. These rules only affect the new .reel-* elements
+   added to index.html; your existing cards, buttons, swatches,
+   and typography rules above are untouched.
+   ========================================================= */
+ 
+/* ---------------------------------------------------------
+   CUSTOMIZE HERE: REEL SIZING
+   REEL_ITEM_WIDTH and REEL_ITEM_GAP here must stay in sync
+   with the matching numbers in script.js (REEL_ITEM_WIDTH /
+   REEL_ITEM_GAP constants near the top of the new JS section).
+   If you change one, change the other, or the landing math
+   will be off and the winning card won't stop under the marker.
+   --------------------------------------------------------- */
+:root {
+  --reel-item-width: 120px;
+  --reel-item-gap: 10px;
+}
+ 
+/* The visible "window" the reel scrolls inside. overflow:hidden
+   is what makes it look like a strip passing behind a slot,
+   instead of a long row of cards spilling across the page.
+ 
+   Note: this deliberately does NOT set its own position/width/
+   height. Those come from ".result-stage > *" further up this
+   file (position: absolute; inset: 0; width/height: 100%), which
+   is what makes the reel exactly fill the same box as the result
+   it's covering — same fixed size the stage was given, whether
+   that's --prompt-stage-height or --palette-stage-height. */
+.reel-viewport {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-bg);
+ 
+  /* Hidden by default. JS adds the "is-active" class right
+     before the animation starts, and removes it once the
+     result has been revealed underneath. */
+  display: none;
+}
+ 
+.reel-viewport.is-active {
+  display: block;
+}
+ 
+/* The long horizontal row of cards. JS slides this element
+   left using a CSS transform — the viewport above is what
+   clips it into a "window." */
+.reel-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: var(--reel-item-gap);
+  padding-left: 8px; /* small breathing room before the first card */
+ 
+  /* No transition by default — JS adds this only for the
+     actual spin, so instantly repositioning the strip back to
+     its start point (for the next spin) doesn't animate. */
+}
+ 
+/* Added by JS only while the strip is moving toward its
+   landing position. cubic-bezier(0.33, 1, 0.68, 1) is the
+   standard "ease-out-cubic" curve: it starts at full speed and
+   eases smoothly to a stop, matching the tick sounds slowing
+   down (see script.js). */
+.reel-track.is-spinning {
+  transition: transform 4.2s cubic-bezier(0.33, 1, 0.68, 1);
+}
+ 
+/* A brief squash-and-settle when the strip stops, added for
+   one animation cycle right after landing. */
+.reel-track.is-landed {
+  animation: reel-bounce 0.35s ease-out;
+}
+ 
+@keyframes reel-bounce {
+  0%   { transform: translateX(var(--reel-final-x)) scaleX(1); }
+  40%  { transform: translateX(var(--reel-final-x)) scaleX(1.015); }
+  100% { transform: translateX(var(--reel-final-x)) scaleX(1); }
+}
+ 
+/* The fixed vertical line marking where the winning card will
+   stop. Sits on top of the strip (z-index) and never moves. */
+.reel-marker {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background-color: var(--color-accent);
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+ 
+/* Small triangles on the marker, purely decorative, to make it
+   read clearly as a "pointer" rather than a stray line. */
+.reel-marker::before,
+.reel-marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+}
+.reel-marker::before {
+  top: -1px;
+  border-top: none;
+  border-bottom-color: var(--color-accent);
+}
+.reel-marker::after {
+  bottom: -1px;
+  border-bottom: none;
+  border-top-color: var(--color-accent);
+}
+ 
+/* One card in the reel. Fixed width is required — the landing
+   math in script.js assumes every card is exactly
+   --reel-item-width wide with --reel-item-gap between them. */
+.reel-item {
+  flex: 0 0 var(--reel-item-width);
+  width: var(--reel-item-width);
+  height: calc(100% - 16px); /* 100% of .reel-track, which is 100% of .reel-viewport, which now fills the result-stage */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+ 
+/* Palette cards show four small color chips stacked above the
+   palette name instead of plain text. */
+.reel-item.palette-reel-item {
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+ 
+.mini-swatch-row {
+  display: flex;
+  width: 100%;
+  height: 28px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+ 
+.mini-swatch-row .mini-swatch {
+  flex: 1 1 0;
+  height: 100%;
+}
+ 
+/* The winning card gets a subtle highlight once the strip has
+   fully stopped, so it's obvious which one "won" even before
+   the description text fades in underneath. */
+.reel-item.is-winner-landed {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+ 
+/* Fade-in used when revealing the full result text/swatches
+   underneath the reel after it lands. JS adds this class, then
+   removes it a moment later (see revealFinalResult in script.js). */
+.result-fade-in {
+  animation: result-fade-in 0.4s ease-out;
+}
+ 
+@keyframes result-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
