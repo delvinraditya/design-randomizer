@@ -13,8 +13,8 @@
    <head>, then just change the font names below.
    --------------------------------------------------------- */
 :root {
-  --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-heading: "Inter", serif;
+  --font-body: "Nunito Sans", sans-serif;
 
   /* ---------------------------------------------------------
      2. CUSTOMIZE HERE: COLORS
@@ -22,13 +22,13 @@
      pulls from these variables, so changing a value here
      updates it everywhere at once.
      --------------------------------------------------------- */
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-text: #111111;
-  --color-text-muted: #6b6b6b;
-  --color-border: #e2e2e2;
-  --color-accent: #111111;      /* button + accent color, swap for a brand color */
-  --color-accent-text: #ffffff; /* text color that sits on top of --color-accent */
+  --color-bg: #0D3A5C;
+  --color-surface: #E8F4FD;
+  --color-text: #E8F4FD;
+  --color-text-muted: #0D3A5C;
+  --color-border: #0D3A5C;
+  --color-accent: #0D3A5C;      /* button + accent color, swap for a brand color */
+  --color-accent-text: #E8F4FD; /* text color that sits on top of --color-accent */
 
   /* ---------------------------------------------------------
      3. CUSTOMIZE HERE: SPACING
@@ -81,7 +81,7 @@ body {
 }
 
 .site-header .subtitle {
-  color: var(--color-text-muted);
+  color: var(--color-text);
   margin-top: var(--space-xs);
   font-size: 1rem;
 }
@@ -105,6 +105,7 @@ body {
    CARD (shared style for both the Design and Palette sections)
    --------------------------------------------------------- */
 .card {
+  color: var(--color-bg);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -123,6 +124,7 @@ body {
 }
 
 .card-header h2 {
+  color: var(--color-bg);
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
@@ -248,10 +250,44 @@ body {
   max-width: 960px;
   margin: var(--space-lg) auto 0;
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   font-size: 0.8rem;
 }
 
+ .floating-logo {
+        position: fixed;       /* Stays in place when scrolling */
+        bottom: 100px;          /* Distance from bottom */
+        right: 20px;           /* Distance from right */
+        z-index: 1000;         /* Always on top */
+        background-color: white;
+        border-radius: 50%;
+        padding: 5px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Hover effect */
+    .floating-logo:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Optional floating animation */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    .floating-logo {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    /* Icon image styling */
+    .floating-logo img {
+        width: 60px;
+        height: 60px;
+        display: block;
+    }
 
 /* ---------------------------------------------------------
    RESPONSIVE: stack the two cards on narrower screens
