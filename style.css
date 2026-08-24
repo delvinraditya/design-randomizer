@@ -75,8 +75,11 @@ body {
   line-height: 1.5;
   padding: var(--space-md);
   background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
   background-image: url('https://res.cloudinary.com/pav3kc8d/image/upload/v1787226375/Cs2_italy.webp');
-  backdrop-filter: blur(10px);
 }
 
 
