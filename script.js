@@ -23,12 +23,11 @@
 const designPrompts = [
   "Poster",
   "Album Cover",
-  "App Icon",
   "Business Card",
   "Social Media Post",
   "Book Cover",
   "Logo Concept",
-  "Product Marketing",
+  "Camera Roll"
 ];
 
 // An array of "objects." An object groups related pieces of
@@ -39,17 +38,17 @@ const colorPalettes = [
   {
     name: "Terracotta Morning",
     hexCodes: ["#E07A5F", "#F2CC8F", "#81B29A", "#3D405B"],
-    description: "A warm, earthy palette built on complementary contrast — clay orange against muted blue-violet, softened by sage and sand."
+    description: "A warm, earthy palette built on complementary contrast, softened by sage and sand."
   },
   {
     name: "Neon Nightlife",
     hexCodes: ["#0D0221", "#FF2E63", "#08D9D6", "#EAEAEA"],
-    description: "High-contrast dark mode with electric accents, inspired by signage and screens. Built for energy and urgency."
+    description: "High-contrast dark mode with electric accents, inspired by signage and screens."
   },
   {
     name: "Soft Botanical",
     hexCodes: ["#F1FAEE", "#A8DADC", "#457B9D", "#1D3557"],
-    description: "A cool, analogous palette moving from near-white through teal into deep navy — calm, trustworthy, and clean."
+    description: "A cool, analogous palette moving from near-white through teal into deep navy calm, trustworthy, and clean."
   },
   {
     name: "Retro Diner",
@@ -70,6 +69,11 @@ const colorPalettes = [
     name: "Brutalist Primary",
     hexCodes: ["#F94144", "#F9C74F", "#277DA1", "#000000"],
     description: "Bold primary colors on black, referencing constructivist posters. Direct, graphic, and unapologetically loud."
+  },
+  {
+    name: "Frutiger Aero",
+    hexCodes: ["#A8DFF0", "#5DBB63", "#FFFFFF", "#1E90FF"],
+    description: "A glossy, optimistic palette from mid-2000s tech UI design, evoking clean water, nature, and polished glass interfaces."
   }
 ];
 
