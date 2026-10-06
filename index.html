@@ -2,99 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0D3A5C">
   <title>Daily Design Randomizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
-
 </head>
 <body>
-  <a href="https://instagram.com/dlvyne" class="floating-logo">
-    <img src="https://res.cloudinary.com/pav3kc8d/image/upload/f_auto,q_auto/DDDDV-05.png" alt="Logo">
+
+  <a href="https://instagram.com/dlvyne" class="floating-logo" target="_blank" rel="noopener" aria-label="Instagram @dlvyne">
+    <img src="https://res.cloudinary.com/pav3kc8d/image/upload/f_auto,q_auto/DDDDV-05.png" alt="">
   </a>
-  <header class="site-header">
-    <h1>Graphic Designer Case</h1>
-    <p  class="subtitle">GOLD GOLD GOLD.</p>
+
+  <header class="top">
+    <h1>Create Something Case</h1>
+    <p class="subtitle"></p>
   </header>
 
-  <main class="wrapper">
+  <main>
 
-    <!-- ===================== -->
-    <!-- SECTION 1: DESIGN PROMPT -->
-    <!-- ===================== -->
-    <section class="card" id="design-section">
-      <div class="card-header">
-        <h2>Design</h2>
-        <span class="eyebrow">Theme</span>
+    <!-- LANE 1: DESIGN THEME
+         .band  = full-width glass strip that holds the reel
+         .plate = glass panel with the result and the Roll button
+         JS finds each lane through data-lane. -->
+    <section class="lane" data-lane="theme" aria-labelledby="themeTitle">
+      <div class="band">
+        <div class="reel" aria-hidden="true"><div class="reel-track"></div></div>
+        <span class="marker" aria-hidden="true"></span>
       </div>
-      <!-- =====================================================
-           The prompt result and its reel now share one fixed-size
-           "stage." Both are absolutely positioned to fill it (see
-           .result-stage in style.css), so only one is visible at
-           a time and the card never grows or shrinks when the
-           reel appears. Element IDs are unchanged — script.js
-           doesn't know or care about this wrapper. -->
-      <div class="result-stage" id="promptStage">
-        <!-- This is where the randomly chosen design prompt gets displayed -->
-        <div class="prompt-display" id="promptDisplay">
-          No  Theme Selected Yet.
-        </div>
-      
-        <div class="reel-viewport" id="promptReelViewport">
-          <div class="reel-marker"></div>
-          <div class="reel-track" id="promptReelTrack"></div>
+
+      <div class="plate">
+        <h2 id="themeTitle">Design theme</h2>
+        <p class="result is-empty" aria-live="polite">No theme selected yet.</p>
+        <p class="hint">Press "Roll" to get a design theme.</p>
+        <div class="foot">
+          <button class="btn" type="button" data-roll="theme" aria-disabled="false">Roll</button>
+          <p class="last"></p>
         </div>
       </div>
-      <p class="prompt-description" id="promptDescription">
-          Press "Roll" to get a design theme.
-        </p>
-      <button class="btn" id="randomizePromptBtn">Roll</button>
-
-      <!-- Optional stretch feature: shows what was picked last time the app was used -->
-      <p class="yesterday-pick" id="yesterdayPrompt"></p>
     </section>
 
-    <!-- ===================== -->
-    <!-- SECTION 2: COLOR PALETTE -->
-    <!-- ===================== -->
-    <section class="card" id="palette-section">
-      <div class="card-header">
-        <h2>Color</h2>
-        <span class="eyebrow">Palette</span>
+    <!-- LANE 2: COLOR PALETTE -->
+    <section class="lane" data-lane="palette" aria-labelledby="paletteTitle">
+      <div class="band">
+        <div class="reel" aria-hidden="true"><div class="reel-track"></div></div>
+        <span class="marker" aria-hidden="true"></span>
       </div>
 
-      <!-- Same fixed-size "stage" pattern as the Design section
-           above: the palette result and its reel are absolutely
-           positioned to fill this container, so the card stays a
-           constant size whether the reel or the result is showing. -->
-      <div class="result-stage" id="paletteStage">
-        <div class="palette-result" id="paletteResult">
-          <!-- The color swatches (small colored boxes) get generated in here by JavaScript -->
-          <div class="swatch-row" id="swatchRow"></div>
-
-          <!-- The palette's name and description text go here -->
-          <h3 class="palette-name" id="paletteName">No Palette Selected Yet.</h3>
+      <div class="plate plate--palette">
+        <h2 id="paletteTitle">Color palette</h2>
+        <!-- Empty placeholders; JS swaps in the real swatches -->
+        <div class="swatches">
+          <span class="swatch is-empty"></span><span class="swatch is-empty"></span>
+          <span class="swatch is-empty"></span><span class="swatch is-empty"></span>
         </div>
-
-        <div class="reel-viewport" id="paletteReelViewport">
-          <div class="reel-marker"></div>
-          <div class="reel-track" id="paletteReelTrack"></div>
+        <p class="result is-empty" aria-live="polite">No palette selected yet.</p>
+        <p class="hint">Press "Roll" to get a color palette.</p>
+        <div class="foot">
+          <button class="btn" type="button" data-roll="palette" aria-disabled="false">Roll</button>
+          <p class="last"></p>
         </div>
       </div>
-<p class="palette-description" id="paletteDescription">Press "Roll" to get a color pallete.</p>
-      <button class="btn" id="randomizePaletteBtn">Roll</button>
-
-      <!-- Optional stretch feature: shows what was picked last time the app was used -->
-      <p class="yesterday-pick" id="yesterdayPalette"></p>
     </section>
 
   </main>
 
   <footer class="site-footer">
-    <p> V1.1 </p>
+    <p>V2.0</p>
   </footer>
 
+  <noscript><p class="noscript">This page needs JavaScript to roll.</p></noscript>
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,569 +1,354 @@
 /* =========================================================
-   DAILY DESIGN RANDOMIZER — STYLESHEET
-   This file is organized so you can art-direct it yourself.
-   Look for the "CUSTOMIZE HERE" comment blocks — those are
-   the spots you'll most likely want to change first.
+   DAILY DESIGN RANDOMIZER — style.css
+   Glassmorphic "case opening" layout.
+   Tweak the tokens in :root first; everything pulls from them.
    ========================================================= */
 
-
-/* ---------------------------------------------------------
-   1. CUSTOMIZE HERE: FONTS
-   Swap these variables for your own typefaces. If you're
-   using Google Fonts, add the <link> tag in index.html's
-   <head>, then just change the font names below.
-   --------------------------------------------------------- */
-:root {
-  --font-heading: "Inter", serif;
-  --font-body: "Nunito Sans", sans-serif;
-
-  /* ---------------------------------------------------------
-     2. CUSTOMIZE HERE: COLORS
-     This is your core color system. Everything in the page
-     pulls from these variables, so changing a value here
-     updates it everywhere at once.
-     --------------------------------------------------------- */
-  --color-bg: #0D3A5C;
-  --color-surface: #E8F4FD;
-  --color-text: #E8F4FD;
-  --color-text-muted: #0D3A5C;
-  --color-border: #0D3A5C;
-  --color-accent: #0D3A5C;      /* button + accent color, swap for a brand color */
-  --color-accent-text: #E8F4FD; /* text color that sits on top of --color-accent */
-
-  /* ---------------------------------------------------------
-     3. CUSTOMIZE HERE: SPACING
-     Adjust these to make the layout feel tighter or airier.
-     Everything below references these instead of raw pixel
-     values, so tweaking one variable adjusts the whole page.
-     --------------------------------------------------------- */
-  --space-xs: 0.5rem;
-  --space-sm: 1rem;
-  --space-md: 2rem;
-  --space-lg: 3.5rem;
-  --space-xl: 5rem;
-
-  --radius: 4px; /* corner roundness — set to 0 for sharp edges */
-
- /* ---------------------------------------------------------
-     4. CUSTOMIZE HERE: RESULT STAGE HEIGHT
-     Fixed heights for the "stage" that holds the result (the
-     prompt text, or the swatches/name/description) and the reel
-     animation. Because both are locked to this same height, the
-     card never grows or shrinks when the reel appears — raise
-     these if you add longer prompts or palette descriptions and
-     text starts feeling cramped.
-     --------------------------------------------------------- */
-  --prompt-stage-height: 200px;
-  --palette-stage-height: 200px;
-}
-
-
-/* ---------------------------------------------------------
-   RESET / BASE
-   Keeps browser default spacing from throwing off your layout.
-   --------------------------------------------------------- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: var(--font-body);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  line-height: 1.5;
-  padding: var(--space-md);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-  background-blend-mode: overlay;
-  background-image: url('https://res.cloudinary.com/pav3kc8d/image/upload/v1787226375/Cs2_italy.webp');
-}
-
-
-/* ---------------------------------------------------------
-   HEADER
-   --------------------------------------------------------- */
-.site-header {
-  text-align: center;
-  margin-bottom: var(--space-lg);
-}
-
-.site-header h1 {
-  font-family: var(--font-heading);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.site-header .subtitle {
-  color: var(--color-text);
-  margin-top: var(--space-xs);
-  font-size: 1rem;
-}
-
-
-/* ---------------------------------------------------------
-   LAYOUT WRAPPER
-   Holds the two sections side by side on wide screens and
-   stacked on narrow screens (see media query near the bottom).
-   --------------------------------------------------------- */
-.wrapper {
-  max-width: 960px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-md);
-}
-
-
-/* ---------------------------------------------------------
-   CARD (shared style for both the Design and Palette sections)
-   --------------------------------------------------------- */
-.card {
-  color: var(--color-bg);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.card-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-sm);
-}
-
-.card-header h2 {
-  color: var(--color-bg);
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.eyebrow {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-muted);
-}
-
-
-/* ---------------------------------------------------------
-   RESULT STAGE
-   The shared container that holds either the result (prompt
-   text, or palette swatches/name/description) or the reel
-   animation — never both changing the page's height at once.
- 
-   position: relative here, combined with position: absolute on
-   both children below, makes the children stack directly on top
-   of each other instead of sitting one after another in normal
-   document flow. Whichever one is visible (display: none/block,
-   controlled by JS toggling "is-active" on .reel-viewport) is
-   what you see; the stage itself always stays the fixed height
-   set by --prompt-stage-height / --palette-stage-height, so nothing
-   around it ever shifts.
-   --------------------------------------------------------- */
-.result-stage {
-  position: relative;
-  width: 100%;
-}
- 
-#promptStage {
-  height: var(--prompt-stage-height);
-}
- 
-#paletteStage {
-  height: var(--palette-stage-height);
-}
- 
-/* Every direct child of a stage (the result, and the reel) fills
-   it exactly — same position, same size — which is what makes
-   them look like one thing swapping in place rather than two
-   separate blocks. */
-.result-stage > * {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* ---------------------------------------------------------
-   DESIGN PROMPT DISPLAY
-   --------------------------------------------------------- */
-.prompt-display {
-  font-family: var(--font-heading);
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 600;
-  margin-top: var(--space-xs);  font-family: var(--font-heading);
-  text-align: center;
-  padding: 0 var(--space-sm);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  overflow: hidden;
-}
-.prompt-description {
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-}
-
-/* ---------------------------------------------------------
-   PALETTE RESULT
-   Wraps the swatches, name, and description as one block so it
-   can be positioned as a single layer inside .result-stage,
-   right alongside the palette reel.
-   --------------------------------------------------------- */
-.palette-result {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-xs);
-  overflow: hidden; /* keeps an unusually long custom description from pushing past the fixed stage height */
-}
- 
- 
-
-/* ---------------------------------------------------------
-   COLOR SWATCHES
-   Each swatch is a plain div with its background-color set
-   by JavaScript. flex-wrap lets them reflow on small screens.
-   --------------------------------------------------------- */
-.swatch-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  flex-shrink: 0;
-}
-
-.swatch {
-  flex: 1 1 60px;
-  height: 80px;
-  border-radius: var(--radius);
-  border: 1px solid var(--color-border);
-  position: relative;
-}
-
-/* Small hex code label shown at the bottom of each swatch */
-.swatch .hex-label {
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 0.65rem;
-  font-family: monospace;
-  color: rgba(255, 255, 255, 0.85);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-}
-
-.palette-name {
-  font-family: var(--font-heading);
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 600;
-  margin-top: var(--space-xs);  font-family: var(--font-heading);
-  text-align: center;
-  padding: 0 var(--space-sm);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  overflow: hidden;
-}
-
-.palette-description {
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-}
-
-
-/* ---------------------------------------------------------
-   BUTTONS
-   --------------------------------------------------------- */
-.btn {
-  align-self: flex-start;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 600;
-  background-color: var(--color-accent);
-  color: var(--color-accent-text);
-  border: none;
-  border-radius: var(--radius);
-  padding: var(--space-xs) var(--space-md);
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.btn:hover {
-  opacity: 0.85;
-}
-
-.btn:active {
-  opacity: 0.7;
-}
-
-.btn:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-
-/* ---------------------------------------------------------
-   "YESTERDAY'S PICK" TEXT (stretch goal feature)
-   --------------------------------------------------------- */
-.yesterday-pick {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-  min-height: 1em; /* keeps layout stable even when empty */
-}
-
-
-/* ---------------------------------------------------------
-   FOOTER
-   --------------------------------------------------------- */
-.site-footer {
-  max-width: 960px;
-  margin: var(--space-lg) auto 0;
-  text-align: center;
-  color: var(--color-text);
-  font-size: 0.8rem;
-}
-/* LOGO NGAMBANG */
- .floating-logo {
-        position: fixed;       /* Stays in place when scrolling */
-        bottom: 100px;          /* Distance from bottom */
-        right: 20px;           /* Distance from right */
-        z-index: 1000;         /* Always on top */
-        background-color: white;
-        border-radius: 50%;
-        padding: 5px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Hover effect */
-    .floating-logo:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-    }
-
-    /* Optional floating animation */
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-    .floating-logo {
-        animation: float 3s ease-in-out infinite;
-    }
-
-    /* Icon image styling */
-    .floating-logo img {
-        width: 60px;
-        height: 60px;
-        display: block;
-    }
-
-/* ---------------------------------------------------------
-   RESPONSIVE: stack the two cards on narrower screens
-   --------------------------------------------------------- */
-@media (max-width: 700px) {
-  .wrapper {
-    grid-template-columns: 1fr;
+   :root {
+    /* Same navy + ice as before, plus lighter/darker tints of the same blue hue */
+    --navy: #0D3A5C;
+    --navy-deep: #071F33;
+    --ice: #E8F4FD;
+    --sky: #62BAF2;
+    --muted: rgb(232 244 253 / .74);
+  
+    /* Glass recipe: translucent fill + light edge + blur */
+    --glass: linear-gradient(135deg, rgb(232 244 253 / .20), rgb(232 244 253 / .06));
+    --glass-line: rgb(232 244 253 / .28);
+    --blur: blur(20px) saturate(150%);
+  
+    --font-display: "Unbounded", system-ui, sans-serif;
+    --font-body: "Nunito Sans", system-ui, sans-serif;
+  
+    /* Reel card size. script.js measures the real cards, so these are safe to change. */
+    --card-w: clamp(116px, 30vw, 172px);
+    --card-h: clamp(124px, 28vw, 168px);
+    --card-gap: 12px;
+  
+    --gutter: clamp(16px, 4vw, 56px);
   }
-}
-/* =========================================================
-   NEW SECTION — CASE-OPENING REVEAL ANIMATION
-   Everything below is additive. Nothing above this line was
-   changed. These rules only affect the new .reel-* elements
-   added to index.html; your existing cards, buttons, swatches,
-   and typography rules above are untouched.
-   ========================================================= */
- 
-/* ---------------------------------------------------------
-   CUSTOMIZE HERE: REEL SIZING
-   REEL_ITEM_WIDTH and REEL_ITEM_GAP here must stay in sync
-   with the matching numbers in script.js (REEL_ITEM_WIDTH /
-   REEL_ITEM_GAP constants near the top of the new JS section).
-   If you change one, change the other, or the landing math
-   will be off and the winning card won't stop under the marker.
-   --------------------------------------------------------- */
-:root {
-  --reel-item-width: 120px;
-  --reel-item-gap: 10px;
-}
- 
-/* The visible "window" the reel scrolls inside. overflow:hidden
-   is what makes it look like a strip passing behind a slot,
-   instead of a long row of cards spilling across the page.
- 
-   Note: this deliberately does NOT set its own position/width/
-   height. Those come from ".result-stage > *" further up this
-   file (position: absolute; inset: 0; width/height: 100%), which
-   is what makes the reel exactly fill the same box as the result
-   it's covering — same fixed size the stage was given, whether
-   that's --prompt-stage-height or --palette-stage-height. */
-.reel-viewport {
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background-color: var(--color-bg);
- 
-  /* Hidden by default. JS adds the "is-active" class right
-     before the animation starts, and removes it once the
-     result has been revealed underneath. */
-  display: none;
-}
- 
-.reel-viewport.is-active {
-  display: block;
-}
- 
-/* The long horizontal row of cards. JS slides this element
-   left using a CSS transform — the viewport above is what
-   clips it into a "window." */
-.reel-track {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  gap: var(--reel-item-gap);
-  padding-left: 8px; /* small breathing room before the first card */
- 
-  /* No transition by default — JS adds this only for the
-     actual spin, so instantly repositioning the strip back to
-     its start point (for the next spin) doesn't animate. */
-}
- 
-/* Added by JS only while the strip is moving toward its
-   landing position. cubic-bezier(0.33, 1, 0.68, 1) is the
-   standard "ease-out-cubic" curve: it starts at full speed and
-   eases smoothly to a stop, matching the tick sounds slowing
-   down (see script.js). */
-.reel-track.is-spinning {
-  transition: transform 4.2s cubic-bezier(0.33, 1, 0.68, 1);
-}
- 
-/* A brief squash-and-settle when the strip stops, added for
-   one animation cycle right after landing. */
-.reel-track.is-landed {
-  animation: reel-bounce 0.35s ease-out;
-}
- 
-@keyframes reel-bounce {
-  0%   { transform: translateX(var(--reel-final-x)) scaleX(1); }
-  40%  { transform: translateX(var(--reel-final-x)) scaleX(1.015); }
-  100% { transform: translateX(var(--reel-final-x)) scaleX(1); }
-}
- 
-/* The fixed vertical line marking where the winning card will
-   stop. Sits on top of the strip (z-index) and never moves. */
-.reel-marker {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: 100%;
-  background-color: var(--color-accent);
-  transform: translateX(-50%);
-  z-index: 2;
-  pointer-events: none;
-}
- 
-/* Small triangles on the marker, purely decorative, to make it
-   read clearly as a "pointer" rather than a stray line. */
-.reel-marker::before,
-.reel-marker::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-}
-.reel-marker::before {
-  top: -1px;
-  border-top: none;
-  border-bottom-color: var(--color-accent);
-}
-.reel-marker::after {
-  bottom: -1px;
-  border-bottom: none;
-  border-top-color: var(--color-accent);
-}
- 
-/* One card in the reel. Fixed width is required — the landing
-   math in script.js assumes every card is exactly
-   --reel-item-width wide with --reel-item-gap between them. */
-.reel-item {
-  flex: 0 0 var(--reel-item-width);
-  width: var(--reel-item-width);
-  height: calc(100% - 16px); /* 100% of .reel-track, which is 100% of .reel-viewport, which now fills the result-stage */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 4px;
-  font-family: var(--font-heading);
-  font-size: 0.85rem;
-  font-weight: 600;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-}
- 
-/* Palette cards show four small color chips stacked above the
-   palette name instead of plain text. */
-.reel-item.palette-reel-item {
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.7rem;
-  font-weight: 500;
-}
- 
-.mini-swatch-row {
-  display: flex;
-  width: 100%;
-  height: 28px;
-  border-radius: 2px;
-  overflow: hidden;
-}
- 
-.mini-swatch-row .mini-swatch {
-  flex: 1 1 0;
-  height: 100%;
-}
- 
-/* The winning card gets a subtle highlight once the strip has
-   fully stopped, so it's obvious which one "won" even before
-   the description text fades in underneath. */
-.reel-item.is-winner-landed {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 2px var(--color-accent);
-}
- 
-/* Fade-in used when revealing the full result text/swatches
-   underneath the reel after it lands. JS adds this class, then
-   removes it a moment later (see revealFinalResult in script.js). */
-.result-fade-in {
-  animation: result-fade-in 0.4s ease-out;
-}
- 
-@keyframes result-fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+  
+  
+  /* ---------- BASE ---------- */
+  
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html { color-scheme: dark; }
+  
+  body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    font-family: var(--font-body);
+    line-height: 1.5;
+    color: var(--ice);
+    background: var(--navy-deep);
+  }
+  
+  /* Background lives on a fixed layer (smoother than background-attachment: fixed
+     on phones). Glow spots + navy wash sit on top of the photo so glass has
+     something to blur. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60vmax 40vmax at 12% 8%, rgb(98 186 242 / .32), transparent 60%),
+      radial-gradient(50vmax 40vmax at 92% 85%, rgb(232 244 253 / .16), transparent 60%),
+      linear-gradient(180deg, rgb(7 31 51 / .78), rgb(13 58 92 / .84)),
+      url("https://res.cloudinary.com/pav3kc8d/image/upload/v1787226375/Cs2_italy.webp") center / cover no-repeat;
+  }
+  
+  :focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; }
+  ::selection { background: var(--sky); color: var(--navy-deep); }
+  
+  
+  /* ---------- HEADER ---------- */
+  
+  .top {
+    padding: max(clamp(28px, 6vw, 64px), env(safe-area-inset-top)) var(--gutter) clamp(24px, 4vw, 40px);
+  }
+  
+  h1 {
+    font: 800 clamp(1.9rem, 5.4vw, 3.8rem) / 1 var(--font-display);
+    letter-spacing: -.035em;
+    text-wrap: balance;
+  }
+  
+  /* Light sweeps across the tagline once on load */
+  .subtitle {
+    margin-top: 14px;
+    width: fit-content;
+    font: 700 .8rem / 1 var(--font-display);
+    letter-spacing: .22em;
+    background: linear-gradient(100deg, var(--sky) 42%, #fff 50%, var(--sky) 58%) 0 0 / 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sheen 2s .5s ease-out backwards;
+  }
+  
+  @keyframes sheen { from { background-position: 100% 0; } }
+  
+  
+  /* ---------- LANE: glass band (reel) + plate (result) ---------- */
+  
+  .lane + .lane { margin-top: clamp(32px, 6vw, 64px); }
+  
+  /* Full-width strip. The plate below overlaps its bottom edge a little,
+     so you see glass layered on glass. */
+  .band {
+    position: relative;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    border-block: 1px solid var(--glass-line);
+    transition: box-shadow .6s;
+  }
+  
+  /* Soft spotlight behind the marker; brighter while spinning / after landing */
+  .band::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(40% 90% at 50% 50%, rgb(98 186 242 / .24), transparent 70%);
+    opacity: .5;
+    transition: opacity .6s;
+    pointer-events: none;
+  }
+  .is-spinning .band::before,
+  .is-done .band::before { opacity: 1; }
+  .is-done .band { box-shadow: 0 0 70px rgb(98 186 242 / .22); }
+  
+  /* The window the strip slides in. Edges fade out with a mask. */
+  .reel {
+    position: relative;
+    height: calc(var(--card-h) + 56px);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  }
+  
+  /* left: 50% starts the row at the viewport center. JS then shifts it
+     left by the card's center, so resizing never breaks the landing. */
+  .reel-track {
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    gap: var(--card-gap);
+    will-change: transform;
+  }
+  
+  /* Marker line, always in the middle */
+  .marker {
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: 2px;
+    translate: -50% 0;
+    background: linear-gradient(transparent, var(--ice) 18%, var(--ice) 82%, transparent);
+    box-shadow: 0 0 18px 2px rgb(98 186 242 / .7);
+    transition: box-shadow .4s;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .marker::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    translate: -50% 0;
+    rotate: 45deg;
+    background: var(--ice);
+  }
+  .is-spinning .marker { box-shadow: 0 0 30px 6px rgb(98 186 242 / .95); }
+  
+  
+  /* ---------- REEL CARDS ---------- */
+  
+  .card {
+    position: relative;
+    flex: 0 0 var(--card-w);
+    height: var(--card-h);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 14px 14px 20px;
+    border: 1px solid var(--glass-line);
+    border-radius: 20px;
+    background: var(--glass), rgb(7 31 51 / .35);
+    font: 700 clamp(.78rem, 1.4vw + .45rem, .98rem) / 1.2 var(--font-display);
+    letter-spacing: -.01em;
+    transition: opacity .5s, filter .5s, border-color .5s, box-shadow .5s,
+                transform .5s cubic-bezier(.3, 1.4, .5, 1);
+  }
+  
+  /* Big faint first letter, plus a colored bar at the bottom (like case rarity) */
+  .card::before {
+    content: attr(data-initial);
+    position: absolute;
+    top: -.1em;
+    right: .1em;
+    font: 800 5.4rem / 1 var(--font-display);
+    opacity: .12;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 6px;
+    background: var(--tone, var(--sky));
+  }
+  
+  /* Palette cards: color stripes on top, name below */
+  .card--palette {
+    padding: 0;
+    justify-content: flex-start;
+    font: 700 .76rem / 1.25 var(--font-body);
+  }
+  .card--palette::before, .card--palette::after { display: none; }
+  .chips { flex: 1; display: flex; }
+  .chips i { flex: 1; }
+  .card--palette span { padding: 9px 12px 12px; }
+  
+  /* After landing: everything else dims, the winner pops */
+  .is-done .card:not(.is-winner) { opacity: .38; filter: saturate(.5); transform: scale(.94); }
+  .card.is-winner {
+    z-index: 1;
+    transform: scale(1.08);
+    border-color: var(--ice);
+    box-shadow: 0 0 0 1px var(--ice), 0 14px 44px rgb(98 186 242 / .55);
+  }
+  
+  
+  /* ---------- PLATE (result panel) ---------- */
+  
+  .plate {
+    position: relative;
+    max-width: 34rem;
+    margin: -20px var(--gutter) 0;
+    padding: 22px 24px 24px;
+    border: 1px solid var(--glass-line);
+    border-radius: 26px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    box-shadow: 0 24px 60px rgb(3 14 24 / .45), inset 0 1px 0 rgb(255 255 255 / .35);
+  }
+  
+  /* Palette plate sits on the right: the two lanes zig-zag */
+  .plate--palette { max-width: 40rem; margin-left: auto; }
+  
+  .plate h2 { font: 700 .95rem var(--font-body); color: var(--muted); }
+  
+  /* min-height keeps the plate the same size before and after a roll */
+  .result {
+    --size: clamp(1.5rem, 4.4vw, 2.6rem);
+    display: flex;
+    align-items: center;
+    min-height: calc(var(--size) * 2.2);
+    margin-top: 6px;
+    font: 700 var(--size) / 1.1 var(--font-display);
+    letter-spacing: -.02em;
+  }
+  .plate--palette .result { --size: clamp(1.15rem, 3vw, 1.6rem); }
+  .result.is-empty { font-size: 1.05rem; font-weight: 500; letter-spacing: 0; color: var(--muted); }
+  
+  .hint { min-height: 1.5em; color: var(--muted); font-size: .95rem; }
+  .plate--palette .hint { min-height: 4.5em; }
+  
+  .foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 18px; }
+  .last { min-height: 1.2em; font-size: .82rem; color: var(--muted); }
+  
+  
+  /* ---------- SWATCHES ---------- */
+  
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+  
+  .swatch {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 92px;
+    padding: 8px 4px;
+    border: 1px solid rgb(255 255 255 / .38);
+    border-radius: 16px;
+    font: 700 .72rem / 1 var(--font-body);
+    font-variant-numeric: tabular-nums;
+  }
+  .swatch.is-empty { border: 1px dashed var(--glass-line); background: rgb(232 244 253 / .06); }
+  
+  
+  /* ---------- BUTTON ---------- */
+  
+  .btn {
+    min-height: 44px;
+    padding: 12px 32px;
+    border: 1px solid var(--ice);
+    border-radius: 999px;
+    background: var(--ice);
+    color: var(--navy);
+    font: 700 1rem var(--font-body);
+    cursor: pointer;
+    box-shadow: 0 8px 28px rgb(98 186 242 / .35);
+    transition: transform .2s, background .2s, opacity .2s;
+  }
+  .btn:hover { background: #fff; transform: translateY(-2px); }
+  .btn:active { transform: scale(.97); }
+  .btn[aria-disabled="true"] { opacity: .45; cursor: progress; transform: none; background: var(--ice); }
+  
+  
+  /* ---------- LOGO + FOOTER ---------- */
+  
+  .floating-logo {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 20;
+    width: 60px;
+    height: 60px;
+    padding: 6px;
+    border: 1px solid var(--glass-line);
+    border-radius: 50%;
+    background: rgb(255 255 255 / .86);
+    -webkit-backdrop-filter: var(--blur);
+    backdrop-filter: var(--blur);
+    box-shadow: 0 8px 24px rgb(3 14 24 / .4);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .floating-logo:hover { transform: scale(1.1); box-shadow: 0 12px 30px rgb(3 14 24 / .5); }
+  .floating-logo img { display: block; width: 100%; height: 100%; }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .floating-logo { animation: float 3s ease-in-out infinite; }
+    @keyframes float { 50% { translate: 0 -5px; } }
+  }
+  
+  .site-footer { padding: clamp(32px, 6vw, 56px) var(--gutter) 110px; font-size: .8rem; color: var(--muted); }
+  .noscript { padding: 0 var(--gutter); }
+  
+  
+  /* ---------- RESPONSIVE + FALLBACKS ---------- */
+  
+  @media (max-width: 720px) {
+    .plate, .plate--palette { max-width: none; margin-inline: var(--gutter); }
+    .swatch { height: 76px; }
+  }
+  
+  /* Browsers without backdrop-filter get a more solid panel instead */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .band, .plate { background: rgb(13 58 92 / .88); }
+  }
+  
+  /* The spin itself stays (it is the whole point, and the sound is synced to it).
+     Only the decorative motion is removed. */
+  @media (prefers-reduced-motion: reduce) {
+    .subtitle { animation: none; }
+    .card, .marker, .band, .band::before, .btn { transition-duration: .01ms; }
+  }
