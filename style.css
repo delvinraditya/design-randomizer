@@ -28,7 +28,14 @@
     --gutter: clamp(16px, 4vw, 56px);
   }
   
-  
+  /* ---------- RARITY COLORS ----------
+   JS sets data-rarity on every card and on the lane after landing.
+   Everything else just reads --rarity-color. */
+[data-rarity="common"]    { --rarity-color: #B8D4EA; }
+[data-rarity="uncommon"]  { --rarity-color: #62BAF2; }
+[data-rarity="rare"]      { --rarity-color: #3F7BFF; }
+[data-rarity="epic"]      { --rarity-color: #A064FF; }
+[data-rarity="legendary"] { --rarity-color: #FFC83D; }
   /* ---------- BASE ---------- */
   
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -111,14 +118,14 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(40% 90% at 50% 50%, rgb(98 186 242 / .24), transparent 70%);
+    background: radial-gradient(40% 90% at 50% 50%, color-mix(in srgb, var(--rarity-color, var(--sky)) 30%, transparent), transparent 70%);
     opacity: .5;
     transition: opacity .6s;
     pointer-events: none;
   }
   .is-spinning .band::before,
   .is-done .band::before { opacity: 1; }
-  .is-done .band { box-shadow: 0 0 70px rgb(98 186 242 / .22); }
+  .is-done .band { box-shadow: 0 0 70px color-mix(in srgb, var(--rarity-color, var(--sky)) 35%, transparent); }
   
   /* The window the strip slides in. Edges fade out with a mask. */
   .reel {
@@ -167,6 +174,7 @@
     background: var(--ice);
   }
   .is-spinning .marker { box-shadow: 0 0 30px 6px rgb(98 186 242 / .95); }
+  .is-done .marker { box-shadow: 0 0 26px 4px color-mix(in srgb, var(--rarity-color, var(--sky)) 85%, transparent); }
   
   
   /* ---------- REEL CARDS ---------- */
@@ -185,6 +193,7 @@
     background: var(--glass), rgb(7 31 51 / .35);
     font: 700 clamp(.78rem, 1.4vw + .45rem, .98rem) / 1.2 var(--font-display);
     letter-spacing: -.01em;
+    box-shadow: inset 0 -28px 36px -24px var(--rarity-color, transparent);
     transition: opacity .5s, filter .5s, border-color .5s, box-shadow .5s,
                 transform .5s cubic-bezier(.3, 1.4, .5, 1);
   }
@@ -203,7 +212,7 @@
     position: absolute;
     inset: auto 0 0;
     height: 6px;
-    background: var(--tone, var(--sky));
+    background: var(--rarity-color, var(--sky));
   }
   
   /* Palette cards: color stripes on top, name below */
@@ -212,7 +221,7 @@
     justify-content: flex-start;
     font: 700 .76rem / 1.25 var(--font-body);
   }
-  .card--palette::before, .card--palette::after { display: none; }
+  .card--palette::before { display: none; }
   .chips { flex: 1; display: flex; }
   .chips i { flex: 1; }
   .card--palette span { padding: 9px 12px 12px; }
@@ -222,8 +231,21 @@
   .card.is-winner {
     z-index: 1;
     transform: scale(1.08);
-    border-color: var(--ice);
-    box-shadow: 0 0 0 1px var(--ice), 0 14px 44px rgb(98 186 242 / .55);
+    border-color: var(--rarity-color, var(--ice));
+    box-shadow: 0 0 0 1px var(--rarity-color, var(--ice)),
+                0 14px 44px color-mix(in srgb, var(--rarity-color, var(--sky)) 60%, transparent),
+                inset 0 -28px 36px -24px var(--rarity-color, transparent);
+  }
+  
+  /* Gold: shimmering bar on the winner + one-time flash on the band */
+  .card.is-winner[data-rarity="legendary"]::after {
+    background: linear-gradient(90deg, #FFC83D, #FFF3C4, #FFC83D) 0 0 / 200% 100%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .card.is-winner[data-rarity="legendary"]::after { animation: gold-shine 2s linear infinite; }
+    .is-done[data-rarity="legendary"] .band { animation: gold-flash .9s ease-out; }
+    @keyframes gold-shine { to { background-position: -200% 0; } }
+    @keyframes gold-flash { from { box-shadow: 0 0 140px 20px rgb(255 200 61 / .7); } }
   }
   
   
@@ -246,6 +268,29 @@
   .plate--palette { max-width: 40rem; margin-left: auto; }
   
   .plate h2 { font: 700 .95rem var(--font-body); color: var(--muted); }
+  /* Rarity badge, top-right corner of the plate. Hidden while empty. */
+.rarity-tag {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  padding: 4px 12px 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--rarity-color, var(--ice)) 60%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rarity-color, var(--ice)) 18%, transparent);
+  color: var(--ice);
+  font: 700 .75rem / 1.4 var(--font-body);
+}
+.rarity-tag:empty { display: none; }
+.rarity-tag::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--rarity-color, var(--ice));
+  box-shadow: 0 0 8px var(--rarity-color, var(--ice));
+}
   
   /* min-height keeps the plate the same size before and after a roll */
   .result {

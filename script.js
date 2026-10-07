@@ -59,7 +59,27 @@ const colorPalettes = [
   }
 ];
 
-
+// Which rarity each item has. Use the exact item name.
+// Items not listed here count as "common".
+const RARITY_OF = {
+  // Themes
+  "Poster": "common",
+  "Social Media Post": "common",
+  "Business Card": "uncommon",
+  "Album Cover": "rare",
+  "Book Cover": "rare",
+  "Logo Concept": "epic",
+  "Camera Roll": "legendary",
+  // Palettes
+  "Monochrome Ink": "common",
+  "Coastal Pastel": "common",
+  "Soft Botanical": "uncommon",
+  "Terracotta Morning": "uncommon",
+  "Retro Diner": "rare",
+  "Neon Nightlife": "epic",
+  "Brutalist Primary": "epic",
+  "Frutiger Aero": "legendary"
+};
 /* ---------- 2. CONFIG ---------- */
 
 const CARDS_TO_TRAVEL = 24;     // how many cards the strip passes before the winner
@@ -69,6 +89,16 @@ const SPIN_EASING = "cubic-bezier(0.33, 1, 0.68, 1)"; // fast start, soft stop
 
 // Tints of the same blue hue, used for the colored bar on theme cards
 const TONES = ["#E8F4FD", "#9AD3F6", "#62BAF2", "#2F8FD0", "#1B6AA3"];
+// Rarity tiers. weight = chance of the tier (the tier is rolled first,
+// then a random item inside it). Weights don't have to add up to 100.
+// Colors live in style.css. The keys must match the CSS names.
+const RARITIES = {
+  common:    { label: "Common",   weight: 45 },
+  uncommon:  { label: "Uncommon", weight: 28 },
+  rare:      { label: "Rare",     weight: 16 },
+  epic:      { label: "Epic",     weight: 8 },
+  legendary: { label: "Gold",     weight: 3 }
+};
 
 const TICK_SOUND_PATH = "https://res.cloudinary.com/pav3kc8d/video/upload/v1787218806/CS_Case_Tick.mp3";
 const LAND_SOUND_PATH = "https://res.cloudinary.com/pav3kc8d/video/upload/v1787218806/CS_Case_Land.mp3";
@@ -134,7 +164,34 @@ const reveal = (...els) => els.forEach((el) => el.animate(
   { duration: 450, delay: 350, easing: "ease-out", fill: "backwards" }
 ));
 
+// Rarity of an item. Unknown or missing names fall back to "common".
+const rarityOf = (lane, item) => {
+  const key = RARITY_OF[lane.name(item)];
+  return RARITIES[key] ? key : "common";
+};
 
+// Weighted pick: roll the tier first, then a random item inside that tier.
+// `avoid` = index that must not come up (the previous winner).
+function pickWeighted(lane, avoid = -1) {
+  const groups = {}; // { rarity: [item indexes] }
+  lane.items.forEach((item, i) => {
+    if (i !== avoid) (groups[rarityOf(lane, item)] ??= []).push(i);
+  });
+
+  const tiers = Object.keys(groups); // only tiers that still have items
+  if (!tiers.length) return 0;
+
+  let roll = Math.random() * tiers.reduce((sum, t) => sum + RARITIES[t].weight, 0);
+  const tier = tiers.find((t) => (roll -= RARITIES[t].weight) < 0) ?? tiers.at(-1);
+  return rand(groups[tier]);
+}
+
+// Build a reel card and tag it with its rarity (CSS reads data-rarity)
+function makeCard(lane, item) {
+  const card = lane.card(item);
+  card.dataset.rarity = rarityOf(lane, item);
+  return card;
+}
 /* ---------- 5. LANES ----------
    Each lane only describes what is different: its data, how a reel card
    looks, and how the result is shown. The spin logic below is shared. */
@@ -213,7 +270,7 @@ async function spin(lane) {
   landAudio.pause();
 
   // 1. Decide the winner first. It never changes during the spin.
-  const winnerIndex = pickIndex(lane.items.length, lane.lastIndex);
+  const winnerIndex = pickWeighted(lane, lane.lastIndex);
   const winner = lane.items[winnerIndex];
   lane.lastIndex = winnerIndex;
 
@@ -221,6 +278,8 @@ async function spin(lane) {
   //    strip continues from where it stopped instead of jumping back.
   lane.root.classList.remove("is-done");
   lane.root.classList.add("is-spinning");
+  delete lane.root.dataset.rarity; // clear the previous result's glow
+  lane.ui.tag.textContent = "";
 
   const drop = Math.max(0, lane.at - EDGE_CARDS); // trim old cards far to the left
   [...track.children].slice(0, drop).forEach((card) => card.remove());
@@ -232,7 +291,7 @@ async function spin(lane) {
   const total = target + 1 + EDGE_CARDS;
   const have = track.children.length;
   track.append(...Array.from({ length: total - have }, (_, i) =>
-    lane.card(have + i === target ? winner : rand(lane.items))
+    makeCard(lane, have + i === target ? winner : lane.items[pickWeighted(lane)])
   ));
 
   // 4. Landing math: how far the strip must travel
@@ -257,6 +316,10 @@ async function spin(lane) {
   lane.root.classList.replace("is-spinning", "is-done");
 
   lane.show(winner);
+  const rarity = rarityOf(lane, winner);
+  lane.root.dataset.rarity = rarity; // tints the band, marker, and plate
+  lane.ui.tag.textContent = RARITIES[rarity].label;
+  reveal(lane.ui.tag);
   store.set(lane.storeKey, lane.name(winner));
   lane.ui.last.textContent = `Last time: ${lane.name(winner)}`;
 }
@@ -295,7 +358,8 @@ for (const [key, lane] of Object.entries(lanes)) {
     result: $(".result", root),
     hint: $(".hint", root),
     last: $(".last", root),
-    swatches: $(".swatches", root)
+    swatches: $(".swatches", root),
+    tag: $(".rarity-tag", root)
   };
 
   // Don't repeat last session's pick on the first roll, and show it as "Last time"
@@ -306,7 +370,7 @@ for (const [key, lane] of Object.entries(lanes)) {
   // Idle strip: random cards with one centered, so the page isn't empty before the first roll
   lane.at = EDGE_CARDS;
   lane.ui.track.replaceChildren(
-    ...Array.from({ length: EDGE_CARDS * 2 + 1 }, () => lane.card(rand(lane.items)))
+    ...Array.from({ length: EDGE_CARDS * 2 + 1 }, () => makeCard(lane, lane.items[pickWeighted(lane)]))
   );
   place(lane);
 
